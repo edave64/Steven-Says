@@ -100,7 +100,12 @@ const SpeakerAliases = {
 	"Ruby (Eyeball)": "Eyeball",
 	"Zircon (D)": "Zircon (Defense)",
 	"Zircon (P)": "Zircon (Prosecuting)",
-	"Rutile": "Rutile Twins"
+	"Rutile": "Rutile Twins",
+	"Barbara Miller": "Barbara",
+	"Mr. Maheswaran": "Doug",
+	"Doug Maheswaran": "Doug",
+	"Mr.": "Doug", // This is a bug when parsing  "Mr. & Dr. Maheswaran". But it works for now.
+	"Lapis Lazuli": "Lapis"
 };
 
 const SpeakerModifiers = [
