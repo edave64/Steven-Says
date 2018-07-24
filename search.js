@@ -19,6 +19,12 @@ function join (args, joiner) {
 }
 
 const DSL = {
+    'and': function () {
+        return join(arguments, "&&");
+    },
+    'or': function () {
+        return join(arguments, "||");
+    },
     'word': function (text) {
         text = escapeRegExp(text.toString());
         return "context.text.match(/\\b" + text + "\\b/i)"
@@ -31,18 +37,14 @@ const DSL = {
         text = text.toString().replace(/\\/g, "\\\\'").replace(/'/g, "\\'");
         return "context.speakers.includes('" + text + "')";
     },
-    'or': function () {
-        return join(arguments, "||");
-    },
     'season': function (number) {
         if (typeof number != "number")
             throw "Argument for 'season' expression must be a number.";
         return "context.season === " + number
     },
-    '': function () {
-        return join(arguments, "&&");
-    },
 }
+
+DSL[''] = DSL['and'] // Expression to use when no name is given
 
 var Parser = new query_dsl.Parser(DSL);
 
