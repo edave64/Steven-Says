@@ -1,5 +1,6 @@
 const data = require("./data.json");
 const query_dsl = require("./query_dsl");
+const readline = require('readline');
 
 function escapeRegExp(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -57,14 +58,35 @@ DSL[''] = DSL['and'] // Expression to use when no name is given
 
 var Parser = new query_dsl.Parser(DSL);
 
-var func = Parser.parse("(word 'tea) (speaker 'Connie) (season 4)");
+const rl = readline.createInterface({
+input: process.stdin,
+output: process.stdout
+});  
 
-console.log(func.toString());
+if (process.argv[2]) {
+    execute(process.argv[2]);
+    process.exit()
+} else {
+    console.log("Please enter your query:");
+    askQuery();
+}
 
+function askQuery () {
+    rl.question("> ", (answer) => {
+        if (answer === "exit") process.exit();
 
-data.seasons.forEach((element, i) => {
-    SearchSeason(i + 1, element, func)
-})
+        execute(answer);
+        askQuery();
+    });
+}
+
+function execute (query) {
+    var func = Parser.parse(query);
+
+    data.seasons.forEach((element, i) => {
+        SearchSeason(i + 1, element, func)
+    })
+}
 
 function SearchSeason (nr, season, func) {
     season.forEach(element => {
