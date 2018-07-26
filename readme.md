@@ -20,7 +20,7 @@ so the project can load its dependencies
 npm run query
 ```
 
-You will be promted to enter a query. Confim it with enter. After it shows you the result, you can enter another query. Enter "exit" to stop. Alternatively, if you just want to one query, you can use.
+You will be promted to enter a query. Confim it with enter. After it shows you the result, you can enter another query. Enter "exit" to stop. Alternatively, if you just want to run one query, you can use.
 
 ```
 npm run query "{{Query}}"
@@ -54,7 +54,7 @@ The following expressions are supported:
   * Example: `(word 'tea)` matches any dialog that contains "tea", but not e.g. "instead".
 * `text`: Matches if a given text is contained in the dialog.
   * Example: `(text 'tea)` matches any dialog that contains "tea", including e.g. "instead".
-* `speaker`: Matches if a dialog is spoken by specific person.
+* `speaker`: Matches if a dialog is spoken by a specific person.
   * Example: `(speaker 'Pearl)` matches any dialog spoken by Pearl.
 * `season`: Matches if the dialog is spoken in a specific season.
   * Example: `(season 4)` matches any dialog in season 4.
