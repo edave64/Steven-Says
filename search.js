@@ -25,6 +25,15 @@ const DSL = {
     'or': function () {
         return join(arguments, "||");
     },
+    'not': function (func) {
+        var text;
+        if (func instanceof query_dsl.FunctionSnipplet) {
+            text = func.text;
+        } else {
+            text = DSL.text(func);
+        }
+        return "!(" + text + ")";
+    },
     'word': function (text) {
         text = escapeRegExp(text.toString());
         return "context.text.match(/\\b" + text + "\\b/i)"
