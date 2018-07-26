@@ -4,7 +4,7 @@
 
 ## Setup
 
-In order to use `Steven Says`, you need to have nodejs installed. Checkout this repository and run:
+In order to use `Steven Says`, you need to have nodejs installed. Checkout/download this repository and run:
 
 ```
 npm install
