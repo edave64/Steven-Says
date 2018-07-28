@@ -60,7 +60,7 @@ The following expressions are supported:
   * Example: `(season 4)` matches any dialog in season 4.
 * `and`: Matches if all given sub expressions match.
   * Example: `(and (speaker 'Pearl) (season 4))` matches any dialog spoken by Pearl in season 4.
-* `or`: Matches if all given sub expressions match.
+* `or`: Matches if any given sub expressions match.
   * Example: `(or (speaker 'Pearl) (season 4))` matches any dialog spoken by Pearl, or by anyone in season 4.
 * `not`: Matches if the given sub expressions does not match.
   * Example: `(not (season 4))` matches any dialog in any other season then 4.
@@ -68,7 +68,7 @@ The following expressions are supported:
   * Example: `(xor (speaker 'Pearl) (season 4))` matches either dialog spoken by Pearl, or spoken in season 4, but not both.
 
 To simplify queries, there are 3 shortcuts:
-* The outer parentesis are not needed required.
+* The outermost parentesis are not required.
   * `(and (text 'test) (word 'dodge))` can also be written as `and (text 'test) (word 'dodge)`
 * If an expression is not given a name, `and` will be implied:
   *  `and (text 'test) (word 'dodge)` can also be written as `(text 'test) (word 'dodge)`
