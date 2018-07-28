@@ -26,6 +26,9 @@ const DSL = {
     'or': function () {
         return join(arguments, "||");
     },
+    'xor': function () {
+        return "(0 + " + join(arguments, "+") + ") === 1";
+    },
     'not': function (func) {
         var text;
         if (func instanceof query_dsl.FunctionSnipplet) {
@@ -37,15 +40,15 @@ const DSL = {
     },
     'word': function (text) {
         text = escapeRegExp(text.toString());
-        return "context.text.match(/\\b" + text + "\\b/i)"
+        return "!!context.text.match(/\\b" + text + "\\b/i)"
     },
     'text': function (text) {
         text = escapeRegExp(text.toString());
-        return "context.text.match(/" + text + "/i)"
+        return "!!context.text.match(/" + text + "/i)"
     },
     'speaker': function (text) {
         text = text.toString().replace(/\\/g, "\\\\'").replace(/'/g, "\\'");
-        return "context.speakers.includes('" + text + "')";
+        return "!!context.speakers.includes('" + text + "')";
     },
     'season': function (number) {
         if (typeof number != "number")
