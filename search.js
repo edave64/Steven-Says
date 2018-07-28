@@ -46,6 +46,14 @@ const DSL = {
         text = escapeRegExp(text.toString());
         return "!!context.text.match(/" + text + "/i)"
     },
+    'begins': function (text) {
+        text = escapeRegExp(text.toString());
+        return "!!context.text.match(/\\b" + text + "/i)"
+    },
+    'ends': function (text) {
+        text = escapeRegExp(text.toString());
+        return "!!context.text.match(/" + text + "\\b/i)"
+    },
     'speaker': function (text) {
         text = text.toString().replace(/\\/g, "\\\\'").replace(/'/g, "\\'");
         return "!!context.speakers.includes('" + text + "')";

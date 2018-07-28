@@ -54,6 +54,10 @@ The following expressions are supported:
   * Example: `(word 'tea)` matches any dialog that contains "tea", but not e.g. "instead".
 * `text`: Matches if a given text is contained in the dialog.
   * Example: `(text 'tea)` matches any dialog that contains "tea", including e.g. "instead".
+* `begins`: Matches if a word in the dialog begins with the given text.
+  * Example: `(begins 'clod)` matches "Clod", "Clods", "cloddy", etc.
+* `ends`: Matches if a word in the dialog ends with the given text.
+  * Example: `(ends 'ing)` matches "Reading", "Recording", "Drawing", etc.
 * `speaker`: Matches if a dialog is spoken by a specific person.
   * Example: `(speaker 'Pearl)` matches any dialog spoken by Pearl.
 * `season`: Matches if the dialog is spoken in a specific season.
