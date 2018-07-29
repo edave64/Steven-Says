@@ -41,34 +41,35 @@ async function ProcessSeason (seasonData) {
 	if (!matches) return;
 	
     const episodes = await Promise.all(matches.map(x => {
-        const titleMatches = x.match(/\|\"\[\[(.*?)\]\]/);
-        if (!titleMatches) debugger;
-        const episodeTitle = titleMatches[1];
-        return ProcessEpisode(episodeTitle.split("|")[0]);
+		x = discardLinks(x, true);
+		const segments = x.split("|").map(x => x.trim());
+		const episodeTitle = segments[4]
+			.replace(/\"/g, '') // Remove surrounding quotes
+			.replace(/\<.*$/g, ''); // Remove possible reference-tags
+		const episodeNr = parseInt(segments[2].match(/\d+/g)[0]);
+        return ProcessEpisode(episodeTitle, episodeNr);
 	}));
 	
 	data.seasons[parseInt(seasonData.title.match(/\d+/)[0]) - 1] = episodes;
 }
 
-async function ProcessEpisode (title) {
-    //console.log(title);
-	const [episodePage, transcript] = await Promise.all([getPage(title), getPage(title + "/Transcript")]);
-	const matches = episodePage.match(/\{\{Episode\s[^\}]+/i);
-	if (!matches) debugger;
-	const episodeNr = matches[0].match(/\|\s*episodenumber\s*=\s*(\d+)/i);
-	if (!episodeNr) debugger;
+/**
+ * Processes and returns the data for a single episode
+ */
+async function ProcessEpisode (title, episodeNr) {
+	const transcript = await getPage(title + "/Transcript");
+	if (!transcript) debugger;
 	const dialog = transcript.match(/\{\{TD\s*\|[^\}]+/gi);
 	if (!dialog) debugger;
 	return {
-		nr: parseInt(episodeNr[1]),
+		nr: episodeNr,
 		title: title,
 		dialog: dialog.map(ProcessDialog)
 	}
 }
 
 function ProcessDialog (tdText) {
-	tdText = tdText.replace(/\[\[[^\]]+\|([^\]]+)\]\]/g, "$1");
-	tdText = tdText.replace(/\[\[([^\]]+)\]\]/g, "$1");
+	tdText = discardLinks(tdText);
 	const segments = tdText.split("|");
 	const speaker = ProcessSpeakers(segments[1]);
 	let text = segments[2] || "";
@@ -164,4 +165,21 @@ function getPage (name) {
 			resolve(data);
 		});
 	})
+}
+
+/**
+ * Removes mediawiki links from a text
+ * @param {string} text
+ * @param {boolean} linkText - Leave link target, instead of the link text
+ * @returns {string} 
+ */
+function discardLinks (text, linkTarget = false) {
+	// Removes [[Target|Text]] syntax
+	if (linkTarget) {
+		text = text.replace(/\[\[([^\]]+)\|[^\]]+\]\]/g, "$1");
+	} else {
+		text = text.replace(/\[\[[^\]]+\|([^\]]+)\]\]/g, "$1");
+	}
+	return text
+		.replace(/\[\[([^\]]+)\]\]/g, "$1"); // Removes [[Target]] syntax
 }
