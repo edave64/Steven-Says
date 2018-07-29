@@ -94,17 +94,55 @@ function ProcessDialog (tdText) {
 }
 
 const SpeakerModifiers = [
-	"Faintly", "excitedly", "Shocked", "offscreen", "T.V", "Voiceover", "Narration", "Narrating", "TV", "voicemail"
+	'faintly',
+	'excitedly',
+	'shocked',
+	'offscreen',
+	'voiceover',
+	'narration',
+	'narrating',
+	'TV',
+	'voicemail',
+	'unison',
+	'whispering'
 ];
 
+// Characters 
+const SharedBodyCharacters = [
+	'Steven',
+	'Connie',
+	'Jamie', /* For Buddy's book */
+]
+
 const SpeakerModifiersExp = new RegExp ('\\((' + SpeakerModifiers.join('|') + ')\\)', 'gi');
+const SharedBodyExp = new RegExp ("^(.*?)\\((through )?(" + SharedBodyCharacters.join("|") + ")\\)$", 'i');
 
 function ProcessSpeakers (text) {
-	const normalizedSpaces = text.replace(/&nbsp;/g, " ");
-	const commonAnnotationsRemoved = normalizedSpaces.replace(/\(''.*?''\)/g, "").replace(SpeakerModifiersExp, "");
-	const seperateSpeakers = commonAnnotationsRemoved.split(/\band\b|<br\s*\/?>|[&,\/]/g).map(x => x.trim()).filter(x => x !== "");
-	const normalizedSpeakers = seperateSpeakers.map(x => dsl_definition.SpeakerAliases[x] || x);
-	return normalizedSpeakers;
+	let sharedBody = false;
+	const speakers = text
+		.replace(/&nbsp;/g, " ")              // Normalize speakers
+		.replace(/\(''.*?''\)/g, "")          // Remove annotaions in parentesis
+		.replace(/\[.*?\]/g, "")              // Remove annotations in brakets
+		.replace(SpeakerModifiersExp, "")     // Remove common annotations
+		.split(/\band\b|<br\s*\/?>|[&,\/]/g)  // Seperate multiple speakers
+		.map(x => x.trim())
+		.filter(x => x !== "")
+		.map(x => x.match(/(on TV|\(T.V\)|TV Narrator)/) ? "TV" : x)       // Normalize TV (None of these characters are all that important)
+		.map(x => x.replace(/^(HW )?Amethyst \d+$/gi, "Unknown Amethyst")) // Normalize Unknown Amethysts (Handled this way to prevent issues with the main Amethyst)
+		.map(x => x.replace(/\s*#?\d+$/gi, ""))                            // Normalize enumerated characters (Names like "Bodyguard #2" are useless for queries)
+		.map(x => dsl_definition.SpeakerAliases[x] || x)                   // Resolve common aliases
+		.map(x => {
+			const match = x.match(SharedBodyExp);
+			if (!match) return x;
+			sharedBody = true;
+			return [match[1].trim(), match[3].trim()];
+		});
+
+	if (sharedBody) {
+		return [].concat.apply([], speakers); // Flatten speakers array, since shared body left sub-array
+	}
+
+	return speakers;
 }
 
 run().then(() => {}).catch((err) => { debugger; console.error(err); });
