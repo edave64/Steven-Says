@@ -1,10 +1,3 @@
-/**
- * Example script getting pages from "Bosons" category on English Wikipedia
- *
- * @see http://en.wikipedia.org/wiki/Category:Bosons
- * @see http://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category%3ABosons&cmlimit=500&format=json
- */
-
 const Bot = require('nodemw'),
 	fs = require('mz/fs'),
 	dsl_definition = require('./dsl_definition'),
@@ -12,24 +5,6 @@ const Bot = require('nodemw'),
 		server: 'steven-universe.wikia.com',
 		path: ''
 	} );
-
-function getPagesInCategory (name) {
-	return new Promise ((resolve, reject) => {
-		client.getPagesInCategory(name, (err, data) => {
-			if (err) reject(err);
-			resolve(data);
-		});
-	});
-}
-
-function getPage (name) {
-	return new Promise ((resolve, reject) => {
-		client.getArticle(name, true, (err, data) => {
-			if (err) reject(err);
-			resolve(data);
-		});
-	})
-}
 
 var data = {
 	seasons: []
@@ -43,8 +18,25 @@ async function run () {
 	fs.writeFile("data.json", JSON.stringify(data));
 }
 
+run().then(() => {}).catch((err) => { debugger; console.error(err); });
+
+/**
+ * Processes and stores the data for every episode of a season.
+ * @param {object} seasonData - The metadata of a single season page 
+ */
 async function ProcessSeason (seasonData) {
-    const seasonPage = await getPage(seasonData.title);
+	const seasonPage = await getPage(seasonData.title);
+
+	// Episodes on a season page are stored in the schema:
+	// {{
+	// |(Overall episode number)
+	// |(Episode number in season)
+	// |(Picture)
+	// |(Title and link)
+	// |(Date)
+	// |(Production code)
+	// |(Episode description)
+	// }}
     const matches = seasonPage.match(/\{\{EP\s[^\}]+/gi);
 	if (!matches) return;
 	
@@ -145,4 +137,31 @@ function ProcessSpeakers (text) {
 	return speakers;
 }
 
-run().then(() => {}).catch((err) => { debugger; console.error(err); });
+
+/**
+ * Returns a Promise for all pages in a given category in the SU wiki
+ * @param {string} name - The name of the category
+ * @returns {Promise<object[]>} 
+ */
+function getPagesInCategory (name) {
+	return new Promise ((resolve, reject) => {
+		client.getPagesInCategory(name, (err, data) => {
+			if (err) reject(err);
+			resolve(data);
+		});
+	});
+}
+
+/**
+ * Returns a Promise for a singe page-content by a page name
+ * @param {string} name - The name of the wiki page
+ * @returns {} 
+ */
+function getPage (name) {
+	return new Promise ((resolve, reject) => {
+		client.getArticle(name, true, (err, data) => {
+			if (err) reject(err);
+			resolve(data);
+		});
+	})
+}
