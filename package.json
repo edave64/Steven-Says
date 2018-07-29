@@ -9,8 +9,14 @@
   },
   "dependencies": {
     "nodemw": "0.12.1",
-    "mz": "2.7.0"
+    "mz": "2.7.0",
+    "chalk": "2.4.1",
+    "escape-string-regexp": "1.0.5"
   },
   "author": "edave64",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/mz": "0.0.32",
+    "@types/escape-string-regexp": "^1.0.0"
+  }
 }

@@ -1,6 +1,7 @@
 const data = require("./data.json");
 const readline = require('readline');
 const queryLanguage = require('./dsl_definition');
+const chalk = require('chalk');
 
 const rl = readline.createInterface({
 input: process.stdin,
@@ -48,9 +49,8 @@ function SearchEpisode (seasonNr, episode, func) {
         }
         if (func(context)) {
             console.log(
-                  "S" + seasonNr
-                + "E" + episode.nr
-                + " [" + element.speakers.join(",") + "] "
+                  chalk.cyanBright(`S${seasonNr}E${episode.nr < 10 ? "0" + episode.nr : episode.nr}`)
+                + chalk.yellowBright(` [${element.speakers.join(",")}] `)
                 + element.text + "\n");
         }
     })

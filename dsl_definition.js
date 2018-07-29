@@ -1,8 +1,5 @@
 const dsl_parser = require("./dsl_parser");
-
-function escapeRegExp(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-}
+const escapeRegExp = require("escape-string-regexp");
 
 function escapeString(str) {
     return str.replace(/\\/g, "\\\\'").replace(/'/g, "\\'");
