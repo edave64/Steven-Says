@@ -28,8 +28,6 @@ function askQuery () {
 function execute (query) {
     var func = queryLanguage.Parser.parse(query);
 
-    console.log("Toast", func);
-
     data.seasons.forEach((element, i) => {
         SearchSeason(i + 1, element, func)
     })
