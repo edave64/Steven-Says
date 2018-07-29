@@ -4,6 +4,10 @@ function escapeRegExp(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
+function escapeString(str) {
+    return str.replace(/\\/g, "\\\\'").replace(/'/g, "\\'");
+}
+
 function normalizeLogicalArgument (arg) {
     if (arg instanceof dsl_parser.FunctionSnipplet) {
         return "(" + arg.text + ")"
@@ -47,8 +51,9 @@ const DSL = {
         return "!!context.text.match(/" + escapeRegExp(text.toString()) + "\\b/i)"
     },
     'speaker': function (text) {
+        text = text.toString();
         text = module.exports.SpeakerAliases[text] || text;
-        text = text.toString().replace(/\\/g, "\\\\'").replace(/'/g, "\\'").toLowerCase();
+        text = escapeString(text.toLowerCase());
         return "!!context.speakers.includes('" + text + "')";
     },
     'season': function (number) {
