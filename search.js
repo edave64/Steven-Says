@@ -8,7 +8,6 @@ output: process.stdout
 });  
 
 if (process.argv[2]) {
-    console.log("Executing: " + process.argv[2]);
     execute(process.argv[2]);
     process.exit()
 } else {
