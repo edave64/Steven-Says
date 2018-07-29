@@ -6,7 +6,8 @@
  */
 
 const Bot = require('nodemw'),
-    fs = require('mz/fs'),
+	fs = require('mz/fs'),
+	dsl_definition = require('./dsl_definition'),
 	client = new Bot( {
 		server: 'steven-universe.wikia.com',
 		path: ''
@@ -92,22 +93,6 @@ function ProcessDialog (tdText) {
 	}
 }
 
-const SpeakerAliases = {
-	"Ruby (Doc)": "Doc",
-	"Ruby (Leggy)": "Leggy",
-	"Ruby (Army)": "Army",
-	"Ruby (Navy)": "Navy",
-	"Ruby (Eyeball)": "Eyeball",
-	"Zircon (D)": "Zircon (Defense)",
-	"Zircon (P)": "Zircon (Prosecuting)",
-	"Rutile": "Rutile Twins",
-	"Barbara Miller": "Barbara",
-	"Mr. Maheswaran": "Doug",
-	"Doug Maheswaran": "Doug",
-	"Mr.": "Doug", // This is a bug when parsing  "Mr. & Dr. Maheswaran". But it works for now.
-	"Lapis Lazuli": "Lapis"
-};
-
 const SpeakerModifiers = [
 	"Faintly", "excitedly", "Shocked", "offscreen", "T.V", "Voiceover", "Narration", "Narrating", "TV", "voicemail"
 ];
@@ -118,7 +103,7 @@ function ProcessSpeakers (text) {
 	const normalizedSpaces = text.replace(/&nbsp;/g, " ");
 	const commonAnnotationsRemoved = normalizedSpaces.replace(/\(''.*?''\)/g, "").replace(SpeakerModifiersExp, "");
 	const seperateSpeakers = commonAnnotationsRemoved.split(/\band\b|<br\s*\/?>|[&,\/]/g).map(x => x.trim()).filter(x => x !== "");
-	const normalizedSpeakers = seperateSpeakers.map(x => SpeakerAliases[x] || x);
+	const normalizedSpeakers = seperateSpeakers.map(x => dsl_definition.SpeakerAliases[x] || x);
 	return normalizedSpeakers;
 }
 

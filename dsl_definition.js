@@ -47,6 +47,7 @@ const DSL = {
         return "!!context.text.match(/" + escapeRegExp(text.toString()) + "\\b/i)"
     },
     'speaker': function (text) {
+        text = module.exports.SpeakerAliases[text] || text;
         text = text.toString().replace(/\\/g, "\\\\'").replace(/'/g, "\\'").toLowerCase();
         return "!!context.speakers.includes('" + text + "')";
     },
@@ -59,4 +60,22 @@ const DSL = {
 
 DSL[''] = DSL['and']; // Expression to use when no name is given
 
-module.exports = new dsl_parser.Parser(DSL);
+module.exports = {
+    Parser: new dsl_parser.Parser(DSL),
+    SpeakerAliases: {
+        "Ruby (Doc)": "Doc",
+        "Ruby (Leggy)": "Leggy",
+        "Ruby (Army)": "Army",
+        "Ruby (Navy)": "Navy",
+        "Ruby (Eyeball)": "Eyeball",
+        "Zircon (D)": "Zircon (Defense)",
+        "Zircon (P)": "Zircon (Prosecuting)",
+        "Rutile": "Rutile Twins",
+        "Barb": "Barbara",
+        "Barbara Miller": "Barbara",
+        "Mr. Maheswaran": "Doug",
+        "Doug Maheswaran": "Doug",
+        "Mr.": "Doug", // This is a bug when parsing  "Mr. & Dr. Maheswaran". But it works for now.
+        "Lapis Lazuli": "Lapis"
+    },
+};

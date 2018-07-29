@@ -26,7 +26,7 @@ function askQuery () {
 }
 
 function execute (query) {
-    var func = queryLanguage.parse(query);
+    var func = queryLanguage.Parser.parse(query);
 
     console.log("Toast", func);
 
