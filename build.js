@@ -15,7 +15,7 @@ async function run () {
 
 	await Promise.all(seasons.map(x => ProcessSeason(x)));
 
-	fs.writeFile("data.json", JSON.stringify(data));
+	fs.writeFile("data.json", JSON.stringify(data, null, 2));
 }
 
 run().then(() => {}).catch((err) => { debugger; console.error(err); });
