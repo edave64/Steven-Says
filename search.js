@@ -2,11 +2,18 @@ const data = require("./data.json");
 const readline = require('readline');
 const queryLanguage = require('./dsl_definition');
 const chalk = require('chalk');
+const vm = require('vm');
 
 const rl = readline.createInterface({
-input: process.stdin,
-output: process.stdout
-});  
+    input: process.stdin,
+    output: process.stdout
+});
+
+var executionContext = {
+    context: null,
+    res: null,
+};
+vm.createContext(executionContext);
 
 if (process.argv[2]) {
     execute(process.argv[2]);
@@ -26,7 +33,8 @@ function askQuery () {
 }
 
 function execute (query) {
-    var func = queryLanguage.Parser.parse(query);
+    var func;
+        func = queryLanguage.Parser.parse(query, true);
 
     data.seasons.forEach((element, i) => {
         SearchSeason(i + 1, element, func)
@@ -47,7 +55,12 @@ function SearchEpisode (seasonNr, episode, func) {
             season: seasonNr,
             episode: episode.nr,
         }
-        if (func(context)) {
+        executionContext.context = context;
+        executionContext.res = null;
+
+        func.runInContext(executionContext);
+
+        if (executionContext.res) {
             console.log(
                   chalk.cyanBright(`S${seasonNr}E${episode.nr < 10 ? "0" + episode.nr : episode.nr}`)
                 + chalk.yellowBright(` [${element.speakers.join(",")}] `)

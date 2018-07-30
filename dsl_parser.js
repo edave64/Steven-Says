@@ -1,11 +1,13 @@
+const vm = require('vm');
+
 module.exports = {
     Parser: (function () {
         function Parser (language) {
             this.language = language;
         }
 
-        Parser.prototype.parse = function (statement) {
-            return this._parseSingleStatement(statement, true, 0);
+        Parser.prototype.parse = function (statement, untrusted) {
+            return this._parseSingleStatement(statement, true, 0, untrusted);
         }
 
         Parser.States = {
@@ -30,7 +32,7 @@ module.exports = {
          * @param {string} statement 
          * @param {boolean} root 
          */
-        Parser.prototype._parseSingleStatement = function (statement, root, begin) {
+        Parser.prototype._parseSingleStatement = function (statement, root, begin, untrusted) {
             let functionName = "";
             let args = [];
             let word = "";
@@ -43,9 +45,6 @@ module.exports = {
                 switch (state) {
                     case Parser.States.ExpressionName:
                         if (isSyntaxChar(char)) {
-                            /*if (word === "") {
-                                throw "Unnamed expression at character " + begin + ".";
-                            }*/
                             functionName = word;
                             state = Parser.States.ExpressionBody;
                             --i;
@@ -126,9 +125,6 @@ module.exports = {
                 args.push(parseInt(word));
             }
             if (state === Parser.States.ExpressionName) {
-                /*if (word === "") {
-                    throw "Unnamed expression at character " + begin + ".";
-                }*/
                 functionName = word;
                 state = Parser.States.ExpressionBody;
             }
@@ -136,7 +132,12 @@ module.exports = {
                 throw "Unexpected end of input";
             }
             const mainFunc = this._buildExpression(functionName, args);
-            return new Function ("context", "return " + mainFunc.text);
+            if (untrusted) {
+                // Generate a script object that can be executed in a seperate context.
+                return vm.createScript("res = " + mainFunc.text);
+            } else {
+                return new Function ("context", "return " + mainFunc.text);
+            }
         }
         /**
          * @param {string} func_name 
