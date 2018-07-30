@@ -76,14 +76,14 @@ To simplify queries, there are 3 shortcuts:
   * `(and (text 'test) (word 'dodge))` can also be written as `and (text 'test) (word 'dodge)`
 * If an expression is not given a name, `and` will be implied:
   *  `and (text 'test) (word 'dodge)` can also be written as `(text 'test) (word 'dodge)`
-* If a string is directly used an `and`, `or`, `xor` or `not` expression, it will automatically be treated as a `text` expression:
+* If a string is directly used in an `and`, `or`, `xor` or `not` expression, it will automatically be treated as a `text` expression:
   * `(text 'test) (word 'dodge)` can also written as `'test (word 'dodge)`
 
 ## Data initialization
-The repository already includes pre-initialized data, but if you need to update it. (E.g. when a new episode is released)
-
-You can update the data using:
+The repository already includes pre-initialized data, but if you need to update it, e.g. when a new episode is released, you can use:
 
 ```
 npm run init-data
 ```
+
+This will parse all transcripts of every episode of the show available in the wiki.
