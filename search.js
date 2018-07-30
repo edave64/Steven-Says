@@ -1,5 +1,6 @@
 const data = require("./data.json");
 const readline = require('readline');
+const parser = require('./dsl_parser');
 const queryLanguage = require('./dsl_definition');
 const chalk = require('chalk');
 const vm = require('vm');
@@ -34,7 +35,19 @@ function askQuery () {
 
 function execute (query) {
     var func;
+    try {
         func = queryLanguage.Parser.parse(query, true);
+    } catch (e) {
+        if (e instanceof queryLanguage.DSLError) {
+            console.error(chalk.red(e.message));
+            return;
+        }
+        if (e instanceof parser.ParserError) {
+            console.error(chalk.red(e.message));
+            return;
+        }
+        throw e;
+    }
 
     data.seasons.forEach((element, i) => {
         SearchSeason(i + 1, element, func)

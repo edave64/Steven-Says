@@ -1,5 +1,12 @@
 const vm = require('vm');
 
+function ParserError(message) {
+    this.name = "ParserError";
+    this.message = (message || "");
+}
+ParserError.prototype = Object.create(Error.prototype);
+ParserError.prototype.constructor = ParserError;
+
 module.exports = {
     Parser: (function () {
         function Parser (language) {
@@ -60,7 +67,7 @@ module.exports = {
                                 args.push(sub_func);
                                 break;
                             case ')':
-                                if (root) throw "Unbalanced parenthesis. The expression closed at character " + (i + 1) + " has not been opened.";
+                                if (root) throw new ParserError ("Unbalanced parenthesis. The expression closed at character " + (i + 1) + " has not been opened.");
                                 return [this._buildExpression(functionName, args), i];
                             case '"':
                                 state = Parser.States.String;
@@ -75,7 +82,7 @@ module.exports = {
                                     state = Parser.States.Integer;
                                     word = char;
                                 } else if (char.trim() !== "") {
-                                    throw "Unexected character '" + char + "' in expression body at position " + (i + 1) + ".";
+                                    throw new ParserError ("Unexected character '" + char + "' in expression body at position " + (i + 1) + ".");
                                 }
                         }
                         break;
@@ -114,7 +121,7 @@ module.exports = {
                 }
             }
             if (!root) {
-                throw "Unbalanced parenthesis. The expression started at character " + begin + " has not been closed.";
+                throw new ParserError ("Unbalanced parenthesis. The expression started at character " + begin + " has not been closed.");
             }
             if (state === Parser.States.Word) {
                 state = Parser.States.ExpressionBody;
@@ -129,7 +136,7 @@ module.exports = {
                 state = Parser.States.ExpressionBody;
             }
             if (state !== Parser.States.ExpressionBody) {
-                throw "Unexpected end of input";
+                throw new ParserError ("Unexpected end of input");
             }
             const mainFunc = this._buildExpression(functionName, args);
             if (untrusted) {
@@ -145,12 +152,19 @@ module.exports = {
          * @returns {FunctionSnipplet}
          */
         Parser.prototype._buildExpression = function (func_name, args) {
-            return new module.exports.FunctionSnipplet(this.language[func_name].apply(undefined, args));
+            var func = this.language[func_name];
+
+            if (!func) {
+                throw new ParserError (`Unknown expression type '${func_name}'.`);
+            } 
+
+            return new module.exports.FunctionSnipplet(func.apply(undefined, args));
         }
 
         return Parser;
     }()),
     FunctionSnipplet: function FunctionSnipplet (text) {
         this.text = text;
-    }
+    },
+    ParserError: ParserError,
 }

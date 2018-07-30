@@ -22,40 +22,87 @@ function join (args, joiner) {
     return text;
 }
 
+function DSLError(message) {
+    this.name = "DSLError";
+    this.message = (message || "");
+}
+DSLError.prototype = Object.create(Error.prototype);
+DSLError.prototype.constructor = DSLError;
+
+function typeName (object) {
+    if (object instanceof dsl_parser.FunctionSnipplet) {
+        return "Sub-Expression"
+    }
+    return typeof object;
+}
+
+function validateMinArguments (name, args, min) {
+    if (args.length < min) {
+        throw new DSLError (`The '${name}' expression needs at least ${min} argument(s). ${args.length} given.`)
+    }
+}
+
+function validateMaxArguments (name, args, max) {
+    if (args.length > max) {
+        throw new DSLError (`The '${name}' expression only supports ${max} argument(s). ${args.length} given.`)
+    }
+}
+
+function validateTextFunction (name, args) {
+    validateMinArguments(name, args, 1);
+    if (typeof args[0] !== "string" && typeof args[0] !== "number") {
+        throw new DSLError (`The 'word' expression only supports string or number arguments. '${typeName(text)}' given.`)
+    }
+    validateMaxArguments(name, args, 1);
+}
+
 const DSL = {
     'and': function () {
+        validateMinArguments("and", arguments, 1);
         return join(arguments, "&&");
     },
     'or': function () {
+        validateMinArguments("or", arguments, 1);
         return join(arguments, "||");
     },
     'xor': function () {
+        validateMinArguments("xor", arguments, 1);
         return "(0 + " + join(arguments, "+") + ") === 1";
     },
     'not': function (func) {
+        validateMinArguments("not", arguments, 1);
+        validateMaxArguments("not", arguments, 1);
         return "!(" + normalizeLogicalArgument(func) + ")";
     },
     'word': function (text) {
+        validateTextFunction("word", arguments);
         return "!!context.text.match(/\\b" + escapeRegExp(text.toString()) + "\\b/i)"
     },
     'text': function (text) {
+        validateTextFunction("text", arguments);
         return "!!context.text.match(/" + escapeRegExp(text.toString()) + "/i)"
     },
     'begins': function (text) {
+        validateTextFunction("begins", arguments);
         return "!!context.text.match(/\\b" + escapeRegExp(text.toString()) + "/i)"
     },
     'ends': function (text) {
+        validateTextFunction("ends", arguments);
         return "!!context.text.match(/" + escapeRegExp(text.toString()) + "\\b/i)"
     },
     'speaker': function (text) {
+        validateTextFunction("speaker", arguments);
         text = text.toString();
         text = module.exports.SpeakerAliases[text] || text;
         text = escapeString(text.toLowerCase());
         return "!!context.speakers.includes('" + text + "')";
     },
     'season': function (number) {
-        if (typeof number != "number")
-            throw "Argument for 'season' expression must be a number.";
+        validateMinArguments("season", arguments, 1);
+        validateMaxArguments("season", arguments, 1);
+        if (typeof number != "number") {
+            throw new DSLError (`The 'season' expression only supports number arguments. '${typeName(number)}' given.`)
+        }
         return "context.season === " + number;
     },
 };
@@ -80,4 +127,5 @@ module.exports = {
         "Mr.": "Doug", // This is a bug when parsing  "Mr. & Dr. Maheswaran". But it works for now.
         "Lapis Lazuli": "Lapis"
     },
+    DSLError: DSLError,
 };
