@@ -51,7 +51,7 @@ function validateMaxArguments (name, args, max) {
 function validateTextFunction (name, args) {
     validateMinArguments(name, args, 1);
     if (typeof args[0] !== "string" && typeof args[0] !== "number") {
-        throw new DSLError (`The 'word' expression only supports string or number arguments. '${typeName(text)}' given.`)
+        throw new DSLError (`The 'word' expression only supports string or number arguments. '${typeName(args[0])}' given.`)
     }
     validateMaxArguments(name, args, 1);
 }
