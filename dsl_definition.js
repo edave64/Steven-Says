@@ -125,7 +125,8 @@ module.exports = {
         "Mr. Maheswaran": "Doug",
         "Doug Maheswaran": "Doug",
         "Mr.": "Doug", // This is a bug when parsing  "Mr. & Dr. Maheswaran". But it works for now.
-        "Lapis Lazuli": "Lapis"
+        "Lapis Lazuli": "Lapis",
+        "Recorder with Peridot talking": "Peridot"
     },
     DSLError: DSLError,
 };
