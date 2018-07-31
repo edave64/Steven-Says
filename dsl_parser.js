@@ -152,12 +152,10 @@ module.exports = {
          * @returns {FunctionSnipplet}
          */
         Parser.prototype._buildExpression = function (func_name, args) {
+            if (!this.language.hasOwnProperty(func_name)) {
+                throw new ParserError(`Unknown expression type '${func_name}'.`);
+            };
             var func = this.language[func_name];
-
-            if (!func) {
-                throw new ParserError (`Unknown expression type '${func_name}'.`);
-            } 
-
             return new module.exports.FunctionSnipplet(func.apply(undefined, args));
         }
 
